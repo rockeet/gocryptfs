@@ -73,6 +73,7 @@ func initDir(args *argContainer) {
 				"Notice: Your CPU does not have AES-GCM acceleration. Consider using -xchacha for better performance." +
 				tlog.ColorReset)
 		}
+		// does not need to check args.sm4 ?
 	}
 	// Choose password for config file
 	if len(args.extpass) == 0 && args.fido2 == "" {
@@ -108,6 +109,7 @@ func initDir(args *argContainer) {
 			Fido2AssertOptions: args.fido2_assert_options,
 			DeterministicNames: args.deterministic_names,
 			XChaCha20Poly1305:  args.xchacha,
+			SM4:                args.sm4,
 			LongNameMax:        args.longnamemax,
 			Masterkey:          handleArgsMasterkey(args),
 		})

@@ -75,6 +75,7 @@ type CreateArgs struct {
 	Fido2AssertOptions []string
 	DeterministicNames bool
 	XChaCha20Poly1305  bool
+	SM4                bool
 	LongNameMax        uint8
 	Masterkey          []byte
 }
@@ -92,6 +93,9 @@ func Create(args *CreateArgs) error {
 	cf.setFeatureFlag(FlagHKDF)
 	if args.XChaCha20Poly1305 {
 		cf.setFeatureFlag(FlagXChaCha20Poly1305)
+	} else if args.SM4 {
+		cf.setFeatureFlag(FlagSM4)
+		cf.setFeatureFlag(FlagGCMIV128)
 	} else {
 		// 128-bit IVs are mandatory for AES-GCM (default is 96!) and AES-SIV,
 		// XChaCha20Poly1305 uses even an even longer IV of 192 bits.
@@ -323,6 +327,9 @@ func getKeyEncrypter(scryptHash []byte, useHKDF bool) *contentenc.ContentEnc {
 func (cf *ConfFile) ContentEncryption() (algo cryptocore.AEADTypeEnum, err error) {
 	if err := cf.Validate(); err != nil {
 		return cryptocore.AEADTypeEnum{}, err
+	}
+	if cf.IsFeatureFlagSet(FlagSM4) {
+		return cryptocore.BackendSM4, nil
 	}
 	if cf.IsFeatureFlagSet(FlagXChaCha20Poly1305) {
 		return cryptocore.BackendXChaCha20Poly1305, nil

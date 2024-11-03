@@ -265,6 +265,10 @@ func initFuseFrontend(args *argContainer) (rootNode fs.InodeEmbedder, wipeKeys f
 		}
 		IVBits = chacha20poly1305.NonceSizeX * 8
 	}
+	if args.sm4 {
+		cryptoBackend = cryptocore.BackendSM4
+		IVBits = 128
+	}
 	// forceOwner implies allow_other, as documented.
 	// Set this early, so args.allow_other can be relied on below this point.
 	if args._forceOwner != nil {
@@ -313,6 +317,8 @@ func initFuseFrontend(args *argContainer) (rootNode fs.InodeEmbedder, wipeKeys f
 				cryptoBackend = cryptocore.BackendOpenSSL
 			case cryptocore.BackendXChaCha20Poly1305:
 				cryptoBackend = cryptocore.BackendXChaCha20Poly1305OpenSSL
+			case cryptocore.BackendSM4:
+				cryptoBackend = cryptocore.BackendSM4
 			}
 		}
 	}

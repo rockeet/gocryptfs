@@ -81,6 +81,7 @@ type argContainer struct {
 	encryptPaths  *bool
 	aessiv        *bool
 	xchacha       *bool
+	sm4           *bool
 	sep0          *bool
 	fido2         *string
 	version       *bool
@@ -94,6 +95,7 @@ func main() {
 	args.sep0 = flag.Bool("0", false, "Use \\0 instead of \\n as separator")
 	args.aessiv = flag.Bool("aessiv", false, "Assume AES-SIV mode instead of AES-GCM")
 	args.xchacha = flag.Bool("xchacha", false, "Assume XChaCha20-Poly1305 mode instead of AES-GCM")
+	args.sm4 = flag.Bool("sm4", false, "Assume SM4-GCM mode instead of AES-GCM")
 	args.fido2 = flag.String("fido2", "", "Protect the masterkey using a FIDO2 token instead of a password")
 	args.version = flag.Bool("version", false, "Print version information")
 
@@ -174,6 +176,8 @@ func inspectCiphertext(args *argContainer, fd *os.File) {
 	algo := cryptocore.BackendGoGCM
 	if *args.aessiv {
 		algo = cryptocore.BackendAESSIV
+	} else if *args.sm4 {
+		algo = cryptocore.BackendSM4
 	} else if *args.xchacha {
 		algo = cryptocore.BackendXChaCha20Poly1305
 	}

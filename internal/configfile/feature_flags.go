@@ -34,6 +34,8 @@ const (
 	FlagFIDO2
 	// FlagXChaCha20Poly1305 means we use XChaCha20-Poly1305 file content encryption
 	FlagXChaCha20Poly1305
+
+	FlagSM4
 )
 
 // knownFlags stores the known feature flags and their string representation
@@ -49,6 +51,7 @@ var knownFlags = map[flagIota]string{
 	FlagHKDF:              "HKDF",
 	FlagFIDO2:             "FIDO2",
 	FlagXChaCha20Poly1305: "XChaCha20Poly1305",
+	FlagSM4:               "SM4",
 }
 
 // isFeatureFlagKnown verifies that we understand a feature flag.

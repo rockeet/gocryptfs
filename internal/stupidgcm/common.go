@@ -3,9 +3,12 @@
 
 package stupidgcm
 
+/*
 import (
 	"log"
+	"github.com/rfjakob/gocryptfs/v2/internal/tlog"
 )
+*/
 
 /*
 #include <openssl/evp.h>
@@ -64,8 +67,11 @@ func (c *stupidAEADCommon) Wiped() bool {
 	if c.wiped {
 		return true
 	}
+	/*
 	if len(c.key) != keyLen {
 		log.Panicf("wrong key length %d", len(c.key))
 	}
+	*/
+	//tlog.Debug.Printf("Wiped: key length %d", len(c.key));
 	return false
 }

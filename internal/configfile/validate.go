@@ -44,6 +44,7 @@ func (cf *ConfFile) Validate() error {
 				return fmt.Errorf("AES-GCM requires GCMIV128 feature flag")
 			}
 		}
+		// not need validate cf.IsFeatureFlagSet(FlagSM4) ?
 	}
 	// Filename encryption
 	{

@@ -32,6 +32,7 @@ type argContainer struct {
 	noprealloc, speed, hkdf, serialize_reads, hh, info,
 	sharedstorage, fsck, one_file_system, deterministic_names,
 	xchacha bool
+	sm4 bool
 	// Mount options with opposites
 	dev, nodev, suid, nosuid, exec, noexec, rw, ro, kernel_cache, acl bool
 	masterkey, mountpoint, cipherdir, cpuprofile,
@@ -188,6 +189,8 @@ func parseCliOpts(osArgs []string) (args argContainer) {
 	flagSet.BoolVar(&args.one_file_system, "one-file-system", false, "Don't cross filesystem boundaries")
 	flagSet.BoolVar(&args.deterministic_names, "deterministic-names", false, "Disable diriv file name randomisation")
 	flagSet.BoolVar(&args.xchacha, "xchacha", false, "Use XChaCha20-Poly1305 file content encryption")
+	// not needed, args.sm4 = true when openssl=sm4
+	//flagSet.BoolVar(&args.sm4, "sm4", false, "Use SM4 file content encryption")
 
 	// Mount options with opposites
 	flagSet.BoolVar(&args.dev, "dev", false, "Allow device files")
@@ -269,6 +272,9 @@ func parseCliOpts(osArgs []string) (args argContainer) {
 		} else {
 			args.openssl = stupidgcm.PreferOpenSSLAES256GCM()
 		}
+	} else if opensslAuto == "sm4" {
+		args.openssl = true
+		args.sm4 = true
 	} else {
 		args.openssl, err = strconv.ParseBool(opensslAuto)
 		if err != nil {

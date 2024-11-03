@@ -44,6 +44,8 @@ func (a AEADTypeEnum) String() string {
 // "AES-GCM-256-OpenSSL" in gocryptfs -speed.
 var BackendOpenSSL = AEADTypeEnum{"AES-GCM-256", "OpenSSL", 16}
 
+var BackendSM4 = AEADTypeEnum{"SM4", "OpenSSL", 16}
+
 // BackendGoGCM specifies the Go based AES-256-GCM backend.
 // "AES-GCM-256-Go" in gocryptfs -speed.
 var BackendGoGCM = AEADTypeEnum{"AES-GCM-256", "Go", 16}
@@ -144,6 +146,15 @@ func New(key []byte, aeadType AEADTypeEnum, IVBitLen int, useHKDF bool) *CryptoC
 		for i := range gcmKey {
 			gcmKey[i] = 0
 		}
+	} else if aeadType == BackendSM4 {
+		if IVBitLen != 128 {
+			log.Panicf("SM4 only supports 128-bit IVs, you wanted %d", IVBitLen)
+		}
+		sm4Key := hkdfDerive(key, hkdfInfoGCMContent, stupidgcm.SM4KeyLen)
+		aeadCipher = stupidgcm.NewSM4GCM(sm4Key)
+		for i := range sm4Key {
+			sm4Key[i] = 0
+		}
 	} else if aeadType == BackendAESSIV {
 		if IVBitLen != 128 {
 			// SIV supports any nonce size, but we only use 128.
@@ -218,8 +229,12 @@ func (c *CryptoCore) Wipe() {
 		// type assertion fails.
 		w := c.AEADCipher.(wiper)
 		w.Wipe()
+	} else if be == BackendSM4 {
+		tlog.Debug.Printf("CryptoCore.Wipe: Wiping SM4Backend %q key", be)
+		w := c.AEADCipher.(wiper)
+		w.Wipe()
 	} else {
-		tlog.Debug.Printf("CryptoCore.Wipe: Only nil'ing stdlib refs")
+		tlog.Debug.Printf("CryptoCore.Wipe: Only nil'ing stdlib refs, %v", be)
 	}
 	// We have no access to the keys (or key-equivalents) stored inside the
 	// Go stdlib. Best we can is to nil the references and force a GC.
